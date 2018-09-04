@@ -29,12 +29,12 @@
       - V-1099
 
 - name: "MEDIUM | V-1099 | PATCH | The account lockout duration must be configured to require an administrator to unlock an account."
-  win_secedit: 
+  win_secedit:
       category: 'System Access'
       key: LockoutDuration
       value: -1
   register: secedit
-  failed_when: "secedit.failed is defined and 'This host is joined to a Domain Controller' not in secedit.msg"
+  #failed_when: "secedit.failed is defined" and 'This host is joined to a Domain Controller' not in secedit.msg
   tags:
       - cat2
       - medium
@@ -55,12 +55,12 @@
       - V-1098
 
 - name: "MEDIUM | V-1098 | PATCH | The period of time before the invalid logon counter is reset must be configured to at least 60 minutes."
-  win_secedit: 
+  win_secedit:
       category: 'System Access'
       key: ResetLockoutCount
       value: 99999
   register: secedit
-  failed_when: "secedit.failed is defined and 'This host is joined to a Domain Controller' not in secedit.msg"
+  ##failed_when: "secedit.failed is defined and 'This host is joined to a Domain Controller' not in secedit.msg"
   tags:
       - cat2
       - medium
@@ -122,7 +122,7 @@
       key: PasswordHistorySize
       value: '12'
   register: secedit
-  failed_when: "secedit.failed is defined and 'This host is joined to a Domain Controller' not in secedit.msg"
+  ##failed_when: "secedit.failed is defined and 'This host is joined to a Domain Controller' not in secedit.msg"
   tags:
       - cat2
       - medium
@@ -145,7 +145,7 @@
       key: EnableGuestAccount
       value: '0'
   register: secedit
-  failed_when: "secedit.failed is defined and 'This host is joined to a Domain Controller' not in secedit.msg"
+  ##failed_when: "secedit.failed is defined and 'This host is joined to a Domain Controller' not in secedit.msg"
   tags:
       - cat2
       - medium
@@ -166,7 +166,7 @@
 #   win_secedit:
 #       category: 'System Access'
 #       key: NewGuestName
-#       # Need single quote and double quote because secedit prepends and apends \" to value like \"value\" 
+#       # Need single quote and double quote because secedit prepends and apends \" to value like \"value\"
 #       value: '"Administrator"'
 #   register: secedit
 #   failed_when: "secedit.failed is defined and 'This host is joined to a Domain Controller' not in secedit.msg"
@@ -226,7 +226,7 @@
       register: temp_dir
 
     - name: "MEDIUM | V-1120 | AUDIT | Copy over ftp script"
-      win_copy: 
+      win_copy:
           src: 1120.txt
           dest: "{{ temp_dir.stdout_lines[0] }}"
       register: copy_hotfix
@@ -285,7 +285,7 @@
       - V-1141
 
 - name: "MEDIUM | V-1145 | AUDIT | Automatic logons must be disabled."
-  win_command: reg query \"HKLM\Software\Microsoft\Windows NT\CurrentVersion\Winlogon\" /v AutoAdminLogon
+  win_shell: reg query 'HKLM\Software\Microsoft\Windows NT\CurrentVersion\Winlogon' /v AutoAdminLogon
   register: disable_automatic_logons_audit
   check_mode: no
   changed_when: no
@@ -324,7 +324,7 @@
       key: PasswordComplexity
       value: '1'
   register: secedit
-  failed_when: "secedit.failed is defined and 'This host is joined to a Domain Controller' not in secedit.msg"
+  #failed_when: "secedit.failed is defined and 'This host is joined to a Domain Controller' not in secedit.msg"
   tags:
       - cat2
       - medium
@@ -344,7 +344,7 @@
       - V-1154
 
 - name: "MEDIUM | V-1154 | PATCH | The Ctrl+Alt+Del security attention sequence for logons will be enabled."
-  win_regedit: 
+  win_regedit:
       key: 'HKLM:\Software\Microsoft\Windows\CurrentVersion\Policies\System'
       value: DisableCAD
       data: 0
@@ -373,7 +373,7 @@
       key: SeDenyNetworkLogonRight
       value: '*S-1-5-32-546' # Guests group
   register: secedit
-  failed_when: "secedit.failed is defined and 'This host is joined to a Domain Controller' not in secedit.msg"
+  #failed_when: "secedit.failed is defined and 'This host is joined to a Domain Controller' not in secedit.msg"
   tags:
       - cat2
       - medium
@@ -453,7 +453,7 @@
       - V-1166
 
 - name: "MEDIUM | V-1171 | AUDIT | Ejection of removable NTFS media is not restricted to Administrators."
-  win_command: reg query \"HKLM\Software\Microsoft\Windows NT\CurrentVersion\Winlogon\" /v AllocateDASD
+  win_shell: reg query 'HKLM\Software\Microsoft\Windows NT\CurrentVersion\Winlogon' /v AllocateDASD
   register: eject_removable_media_audit
   check_mode: no
   changed_when: no
@@ -492,7 +492,7 @@
       key: ClearTextPassword
       value: '0'
   register: secedit
-  failed_when: "secedit.failed is defined and 'This host is joined to a Domain Controller' not in secedit.msg"
+  #failed_when: "secedit.failed is defined and 'This host is joined to a Domain Controller' not in secedit.msg"
   tags:
       - cat2
       - medium
@@ -676,7 +676,7 @@
 #       - V-3383
 
 - name: "MEDIUM | V-3385 | AUDIT | The system must be configured to require case insensitivity for non-Windows subsystems."
-  win_command: reg query \"HKLM\System\CurrentControlSet\Control\Session Manager\Kernel\" /v ObCaseInsensitive
+  win_shell: reg query 'HKLM\System\CurrentControlSet\Control\Session Manager\Kernel' /v ObCaseInsensitive
   register: case_insensitive_audit
   check_mode: no
   changed_when: no
@@ -700,7 +700,7 @@
       - V-3385
 
 - name: "MEDIUM | V-3449 | AUDIT | Remote Desktop Services will limit users to one remote session."
-  win_command: reg query \"HKLM\Software\Policies\Microsoft\Windows NT\Terminal Services\" /v fSingleSessionPerUser
+  win_shell: reg query 'HKLM\Software\Policies\Microsoft\Windows NT\Terminal Services' /v fSingleSessionPerUser
   register: single_rdp_audit
   check_mode: no
   changed_when: no
@@ -724,7 +724,7 @@
       - V-3449
 
 - name: "MEDIUM | V-3453 | AUDIT | Remote Desktop Services will always prompt a client for passwords upon connection."
-  win_command: reg query \"HKLM\Software\Policies\Microsoft\Windows NT\Terminal Services\" /v fPromptForPassword
+  win_shell: reg query 'HKLM\Software\Policies\Microsoft\Windows NT\Terminal Services' /v fPromptForPassword
   register: rdp_password_prompt_audit
   check_mode: no
   changed_when: no
@@ -748,7 +748,7 @@
       - V-3453
 
 - name: "MEDIUM | V-3454 | AUDIT | Remote Desktop Services will be configured with the client connection encryption set to the required level."
-  win_command: reg query \"HKLM\Software\Policies\Microsoft\Windows NT\Terminal Services\" /v MinEncryptionLevel
+  win_shell: reg query 'HKLM\Software\Policies\Microsoft\Windows NT\Terminal Services' /v MinEncryptionLevel
   register: min_encrypt_audit
   check_mode: no
   changed_when: no
@@ -760,7 +760,7 @@
       - V-3454
 
 - name: "MEDIUM | V-3455 | AUDIT | Remote Desktop Services will be configured to use session-specific temporary folders."
-  win_command: reg query \"HKLM\Software\Policies\Microsoft\Windows NT\Terminal Services\" /v PerSessionTempDir
+  win_shell: reg query 'HKLM\Software\Policies\Microsoft\Windows NT\Terminal Services' /v PerSessionTempDir
   register: temp_folder_audit
   check_mode: no
   changed_when: no
@@ -784,7 +784,7 @@
       - V-3455
 
 - name: "MEDIUM | V-3456 | AUDIT | Remote Desktop Services will delete temporary folders when a session is terminated."
-  win_command: reg query \"HKLM\Software\Policies\Microsoft\Windows NT\Terminal Services\" /v DeleteTempDirsOnExit
+  win_shell: reg query 'HKLM\Software\Policies\Microsoft\Windows NT\Terminal Services' /v DeleteTempDirsOnExit
   register: delete_temp_folder_audit
   check_mode: no
   changed_when: no
@@ -808,7 +808,7 @@
       - V-3456
 
 - name: "MEDIUM | V-3457 | AUDIT | Remote Desktop Services will be configured to set a time limit for disconnected sessions."
-  win_command: reg query \"HKLM\Software\Policies\Microsoft\Windows NT\Terminal Services\" /v MaxDisconnectionTime
+  win_shell: reg query 'HKLM\Software\Policies\Microsoft\Windows NT\Terminal Services' /v MaxDisconnectionTime
   register: max_disconnection_time_audit
   check_mode: no
   changed_when: no
@@ -832,7 +832,7 @@
       - V-3457
 
 - name: "MEDIUM | V-3458 | AUDIT | Remote Desktop Services will be configured to disconnect an idle session after the specified time period."
-  win_command: reg query \"HKLM\Software\Policies\Microsoft\Windows NT\Terminal Services\" /v MaxIdleTime
+  win_shell: reg query 'HKLM\Software\Policies\Microsoft\Windows NT\Terminal Services' /v MaxIdleTime
   register: max_idle_time_audit
   check_mode: no
   changed_when: no
@@ -880,7 +880,7 @@
       - V-3469
 
 - name: "MEDIUM | V-3470 | AUDIT | The system will be configured to prevent unsolicited remote assistance offers."
-  win_command: reg query \"HKLM\Software\Policies\Microsoft\Windows NT\Terminal Services\" /v fAllowUnsolicited
+  win_shell: reg query 'HKLM\Software\Policies\Microsoft\Windows NT\Terminal Services' /v fAllowUnsolicited
   register: unsolicited_remote_assistance_audit
   check_mode: no
   changed_when: no
@@ -904,7 +904,7 @@
       - V-3470
 
 - name: "MEDIUM | V-3479 | AUDIT | The system will be configured to use Safe DLL Search Mode."
-  win_command: reg query \"HKLM\System\CurrentControlSet\Control\Session Manager\" /v SafeDllSearchMode
+  win_shell: reg query 'HKLM\System\CurrentControlSet\Control\Session Manager' /v SafeDllSearchMode
   register: safe_DLL_audit
   check_mode: no
   changed_when: no
@@ -1035,7 +1035,7 @@
       - V-4446
 
 - name: "MEDIUM | V-4447 | AUDIT | The Remote Desktop Session Host will require secure RPC communications."
-  win_command: reg query \"HKLM\Software\Policies\Microsoft\Windows NT\Terminal Services\" /v fEncryptRPCTraffic
+  win_shell: reg query 'HKLM\Software\Policies\Microsoft\Windows NT\Terminal Services' /v fEncryptRPCTraffic
   register: encrypt_RPC_audit
   check_mode: no
   changed_when: no
@@ -1059,7 +1059,7 @@
       - V-4447
 
 - name: "MEDIUM | V-4448 | AUDIT | Group Policy objects will be reprocessed even if they have not changed."
-  win_command: reg query \"HKLM\Software\Policies\Microsoft\Windows\Group Policy\{35378EAC-683F-11D2-A89A-00C04FBBCFA2}\" /v NoGPOListChanges
+  win_shell: reg query 'HKLM\Software\Policies\Microsoft\Windows\Group Policy\{35378EAC-683F-11D2-A89A-00C04FBBCFA2}' /v NoGPOListChanges
   register: reprocess_GPO_audit
   check_mode: no
   changed_when: no
@@ -1155,12 +1155,12 @@
       - V-6836
 
 - name: "MEDIUM | V-6836 | PATCH | For systems utilizing a logon ID as the individual identifier, passwords will, at a minimum, be 14 characters."
-  win_secedit: 
+  win_secedit:
       category: 'System Access'
       key: MinimumPasswordLength
       value: '8'
   register: secedit
-  failed_when: "secedit.failed is defined and 'This host is joined to a Domain Controller' not in secedit.msg"
+  #failed_when: "secedit.failed is defined and 'This host is joined to a Domain Controller' not in secedit.msg"
   tags:
       - cat2
       - medium
@@ -1336,7 +1336,7 @@
       - V-14242
 
 - name: "MEDIUM | V-14247 | AUDIT | Passwords will not be saved in the Remote Desktop Client."
-  win_command: reg query \"HKLM\Software\Policies\Microsoft\Windows NT\Terminal Services\" /v DisablePasswordSaving
+  win_shell: reg query 'HKLM\Software\Policies\Microsoft\Windows NT\Terminal Services' /v DisablePasswordSaving
   register: disable_RDC_password_saving_audit
   check_mode: no
   changed_when: no
@@ -1360,7 +1360,7 @@
       - V-14247
 
 - name: "MEDIUM | V-14249 | AUDIT | Local drives will be prevented from sharing with Remote Desktop Session Hosts (Remote Desktop Services Role)."
-  win_command: reg query \"HKLM\Software\Policies\Microsoft\Windows NT\Terminal Services\" /v fDisableCdm
+  win_shell: reg query 'HKLM\Software\Policies\Microsoft\Windows NT\Terminal Services' /v fDisableCdm
   register: disable_local_drive_audit
   check_mode: no
   changed_when: no
@@ -1384,7 +1384,7 @@
     - V-14249
 
 - name: "MEDIUM | V-14253 | AUDIT | Unauthenticated RPC clients must be restricted from connecting to the RPC server."
-  win_command: reg query \"HKLM\SOFTWARE\Policies\Microsoft\Windows NT\Rpc\" /v RestrictRemoteClients
+  win_shell: reg query 'HKLM\SOFTWARE\Policies\Microsoft\Windows NT\Rpc' /v RestrictRemoteClients
   register: restrict_remote_clients_audit
   check_mode: no
   changed_when: no
@@ -1396,7 +1396,7 @@
       - V-14253
 
 - name: "MEDIUM | V-14253 | PATCH | Unauthenticated RPC clients must be restricted from connecting to the RPC server."
-  win_regedit: 
+  win_regedit:
       key: 'HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Rpc'
       value: RestrictRemoteClients
       data: 1
@@ -1408,7 +1408,7 @@
       - V-14253
 
 - name: "MEDIUM | V-14254 | AUDIT | Client computers must be required to authenticate for RPC communication."
-  win_command: reg query \"HKLM\SOFTWARE\Policies\Microsoft\Windows NT\Rpc\" /v EnableAuthEpResolution
+  win_shell: reg query 'HKLM\SOFTWARE\Policies\Microsoft\Windows NT\Rpc' /v EnableAuthEpResolution
   register: require_auth_RPC_audit
   check_mode: no
   changed_when: no
@@ -1420,7 +1420,7 @@
       - V-14254
 
 - name: "MEDIUM | V-14254 | PATCH | Client computers must be required to authenticate for RPC communication."
-  win_regedit: 
+  win_regedit:
       key: 'HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Rpc'
       value: EnableAuthEpResolution
       data: 1
@@ -1432,7 +1432,7 @@
       - V-14254
 
 - name: "MEDIUM | V-14259 | AUDIT | Printing over HTTP will be prevented."
-  win_command: reg query \"HKLM\Software\Policies\Microsoft\Windows NT\Printers\" /v DisableHTTPPrinting
+  win_shell: reg query 'HKLM\Software\Policies\Microsoft\Windows NT\Printers' /v DisableHTTPPrinting
   register: disable_HTTP_printing_audit
   check_mode: no
   changed_when: no
@@ -1456,7 +1456,7 @@
       - V-14259
 
 - name: "MEDIUM | V-14260 | AUDIT | Downloading print driver packages over HTTP will be prevented."
-  win_command: reg query \"HKLM\Software\Policies\Microsoft\Windows NT\Printers\" /v DisableWebPnPDownload
+  win_shell: reg query 'HKLM\Software\Policies\Microsoft\Windows NT\Printers' /v DisableWebPnPDownload
   register: disable_HTTP_printer_drivers_audit
   check_mode: no
   changed_when: no
@@ -1600,7 +1600,7 @@
       - V-15666
 
 - name: "MEDIUM | V-15667 | AUDIT | Network Bridges will be prohibited in Windows."
-  win_command: reg query \"HKLM\Software\Policies\Microsoft\Windows\Network Connections\" /v NC_AllowNetBridge_NLA
+  win_shell: reg query 'HKLM\Software\Policies\Microsoft\Windows\Network Connections' /v NC_AllowNetBridge_NLA
   register: network_bridge_audit
   check_mode: no
   changed_when: no
@@ -1624,7 +1624,7 @@
       - V-15667
 
 - name: "MEDIUM | V-15682 | AUDIT | Attachments must be prevented from being downloaded from RSS feeds."
-  win_command: reg query \"HKLM\SOFTWARE\Policies\Microsoft\Internet Explorer\Feeds\" /v DisableEnclosureDownload
+  win_shell: reg query 'HKLM\SOFTWARE\Policies\Microsoft\Internet Explorer\Feeds' /v DisableEnclosureDownload
   register: no_attachments_from_RSS_audit
   check_mode: no
   changed_when: no
@@ -1701,12 +1701,12 @@
       - V-15696
 
 - name: "MEDIUM | V-15696 | PATCH | The Mapper I/O network protocol driver will be disabled."
-  win_regedit: 
+  win_regedit:
       key: 'HKLM:\Software\Policies\Microsoft\Windows\LLTD'
       value: "{{ item }}"
       data: 0
       datatype: dword
-  with_items: 
+  with_items:
       - AllowLLTDIOOndomain
       - AllowLLTDIOOnPublicNet
       - EnableLLTDIO
@@ -1884,7 +1884,7 @@
       - V-15706
 
 - name: "MEDIUM | V-15713 | AUDIT | Windows Defender SpyNet membership will be disabled."
-  win_command: reg query \"HKLM\Software\Policies\Microsoft\Windows Defender\Spynet\" /v SpyNetReporting
+  win_shell: reg query 'HKLM\Software\Policies\Microsoft\Windows Defender\Spynet' /v SpyNetReporting
   register: disable_spynet_audit
   check_mode: no
   changed_when: no
@@ -1907,7 +1907,7 @@
       - V-15713
 
 - name: "MEDIUM | V-15714 | AUDIT | The system must be configured to save Error Reporting events and messages to the system event log."
-  win_command: reg query \"HKLM\SOFTWARE\Policies\Microsoft\Windows\Windows Error Reporting\" /v LoggingDisabled
+  win_shell: reg query 'HKLM\SOFTWARE\Policies\Microsoft\Windows\Windows Error Reporting' /v LoggingDisabled
   register: save_error_logging_audit
   check_mode: no
   changed_when: no
@@ -1931,7 +1931,7 @@
       - V-15714
 
 - name: "MEDIUM | V-15715 | AUDIT | The system must be configured to generate error reports."
-  win_command: reg query \"HKLM\SOFTWARE\Policies\Microsoft\Windows\Windows Error Reporting\" /v Disabled
+  win_shell: reg query 'HKLM\SOFTWARE\Policies\Microsoft\Windows\Windows Error Reporting' /v Disabled
   register: enable_error_logging_audit
   check_mode: no
   changed_when: no
@@ -2019,7 +2019,7 @@
   check_mode: no
   changed_when: no
   when: "'Name' not in item[0] and item[0]"
-  with_nested: 
+  with_nested:
       - "{{ list_of_drives_audit.stdout_lines }}"
       - [ "*.p12", "*.pfx" ]
   tags:
@@ -2041,7 +2041,7 @@
       - V-15991
 
 - name: "MEDIUM | V-15997 | AUDIT | The system will be configured to prevent users from mapping local COM ports and redirecting data from the Remote Desktop Session Host to local COM ports. (Remote Desktop Services Role)"
-  win_command: reg query \"HKLM\Software\Policies\Microsoft\Windows NT\Terminal Services\" /v fDisableCcm
+  win_shell: reg query 'HKLM\Software\Policies\Microsoft\Windows NT\Terminal Services' /v fDisableCcm
   register: COM_port_redirection_audit
   check_mode: no
   changed_when: no
@@ -2065,7 +2065,7 @@
       - V-15997
 
 - name: "MEDIUM | V-15998 | AUDIT | The system will be configured to prevent users from mapping local LPT ports and redirecting data from the Remote Desktop Session Host to local LPT ports. (Remote Desktop Services Role)"
-  win_command: reg query \"HKLM\Software\Policies\Microsoft\Windows NT\Terminal Services\" /v fDisableLPT
+  win_shell: reg query 'HKLM\Software\Policies\Microsoft\Windows NT\Terminal Services' /v fDisableLPT
   register: disable_LPT_audit
   check_mode: no
   changed_when: no
@@ -2089,7 +2089,7 @@
       - V-15998
 
 - name: "MEDIUM | V-15999 | AUDIT | The system will be configured to prevent users from redirecting Plug and Play devices to the Remote Desktop Session Host. (Remote Desktop Services Role)"
-  win_command: reg query \"HKLM\Software\Policies\Microsoft\Windows NT\Terminal Services\" /v fDisablePNPRedir
+  win_shell: reg query 'HKLM\Software\Policies\Microsoft\Windows NT\Terminal Services' /v fDisablePNPRedir
   register: PnP_redirect_audit
   check_mode: no
   changed_when: no
@@ -2113,7 +2113,7 @@
       - V-15999
 
 - name: "MEDIUM | V-16000 | AUDIT | The system will be configured to ensure smart card devices can be redirected to the Remote Desktop Session. (Remote Desktop Services Role)"
-  win_command: reg query \"HKLM\Software\Policies\Microsoft\Windows NT\Terminal Services\" /v fEnableSmartCard
+  win_shell: reg query 'HKLM\Software\Policies\Microsoft\Windows NT\Terminal Services' /v fEnableSmartCard
   register: smart_card_redirect_audit
   check_mode: no
   changed_when: no
@@ -2356,7 +2356,7 @@
       key: SeTrustedCredManAccessPrivilege
       value: ''
   register: secedit
-  failed_when: "secedit.failed is defined and 'This host is joined to a Domain Controller' not in secedit.msg"
+  #failed_when: "secedit.failed is defined and 'This host is joined to a Domain Controller' not in secedit.msg"
   tags:
       - cat2
       - medium
@@ -2379,7 +2379,7 @@
       key: SeNetworkLogonRight
       value: '*S-1-5-11,*S-1-5-32-544' #Authenticated Users, Administrators
   register: secedit
-  failed_when: "secedit.failed is defined and 'This host is joined to a Domain Controller' not in secedit.msg"
+  #failed_when: "secedit.failed is defined and 'This host is joined to a Domain Controller' not in secedit.msg"
   tags:
       - cat2
       - medium
@@ -2402,7 +2402,7 @@
       key: SeIncreaseQuotaPrivilege
       value: '*S-1-5-19,*S-1-5-20,*S-1-5-32-544' #Local Service, Network Service, Administrators
   register: secedit
-  failed_when: "secedit.failed is defined and 'This host is joined to a Domain Controller' not in secedit.msg"
+  #failed_when: "secedit.failed is defined and 'This host is joined to a Domain Controller' not in secedit.msg"
   tags:
       - cat2
       - medium
@@ -2425,7 +2425,7 @@
       key: SeInteractiveLogonRight
       value: '*S-1-5-32-544' #Administrators
   register: secedit
-  failed_when: "secedit.failed is defined and 'This host is joined to a Domain Controller' not in secedit.msg"
+  #failed_when: "secedit.failed is defined and 'This host is joined to a Domain Controller' not in secedit.msg"
   tags:
       - cat2
       - medium
@@ -2448,7 +2448,7 @@
       key: SeRemoteInteractiveLogonRight
       value: '*S-1-5-32-544' #Administrators
   register: secedit
-  failed_when: "secedit.failed is defined and 'This host is joined to a Domain Controller' not in secedit.msg"
+  #failed_when: "secedit.failed is defined and 'This host is joined to a Domain Controller' not in secedit.msg"
   tags:
       - cat2
       - medium
@@ -2471,7 +2471,7 @@
       key: SeBackupPrivilege
       value: '*S-1-5-32-544' #Administrators
   register: secedit
-  failed_when: "secedit.failed is defined and 'This host is joined to a Domain Controller' not in secedit.msg"
+  #failed_when: "secedit.failed is defined and 'This host is joined to a Domain Controller' not in secedit.msg"
   tags:
       - cat2
       - medium
@@ -2494,7 +2494,7 @@
       key: SeSystemtimePrivilege
       value: '*S-1-5-19,*S-1-5-32-544' #Local Service, Administrators
   register: secedit
-  failed_when: "secedit.failed is defined and 'This host is joined to a Domain Controller' not in secedit.msg"
+  #failed_when: "secedit.failed is defined and 'This host is joined to a Domain Controller' not in secedit.msg"
   tags:
       - cat2
       - medium
@@ -2517,7 +2517,7 @@
       key: SeCreatePagefilePrivilege
       value: '*S-1-5-32-544' #Administrators
   register: secedit
-  failed_when: "secedit.failed is defined and 'This host is joined to a Domain Controller' not in secedit.msg"
+  #failed_when: "secedit.failed is defined and 'This host is joined to a Domain Controller' not in secedit.msg"
   tags:
       - cat2
       - medium
@@ -2540,7 +2540,7 @@
       key: SeCreateGlobalPrivilege
       value: '*S-1-5-19,*S-1-5-20,*S-1-5-32-544,*S-1-5-6' #Local Service, Network Service, Administrators, Service
   register: secedit
-  failed_when: "secedit.failed is defined and 'This host is joined to a Domain Controller' not in secedit.msg"
+  #failed_when: "secedit.failed is defined and 'This host is joined to a Domain Controller' not in secedit.msg"
   tags:
       - cat2
       - medium
@@ -2563,7 +2563,7 @@
       key: SeCreatePermanentPrivilege
       value: ''
   register: secedit
-  failed_when: "secedit.failed is defined and 'This host is joined to a Domain Controller' not in secedit.msg"
+  #failed_when: "secedit.failed is defined and 'This host is joined to a Domain Controller' not in secedit.msg"
   tags:
       - cat2
       - medium
@@ -2586,7 +2586,7 @@
       key: SeCreateSymbolicLinkPrivilege
       value: '*S-1-5-32-544' #Administrators
   register: secedit
-  failed_when: "secedit.failed is defined and 'This host is joined to a Domain Controller' not in secedit.msg"
+  #failed_when: "secedit.failed is defined and 'This host is joined to a Domain Controller' not in secedit.msg"
   tags:
       - cat2
       - medium
@@ -2609,7 +2609,7 @@
       key: SeDenyBatchLogonRight
       value: '*S-1-5-32-546' #Guests
   register: secedit
-  failed_when: "secedit.failed is defined and 'This host is joined to a Domain Controller' not in secedit.msg"
+  #failed_when: "secedit.failed is defined and 'This host is joined to a Domain Controller' not in secedit.msg"
   tags:
       - cat2
       - medium
@@ -2632,7 +2632,7 @@
       key: SeDenyServiceLogonRight
       value: ''
   register: secedit
-  failed_when: "secedit.failed is defined and 'This host is joined to a Domain Controller' not in secedit.msg"
+  #failed_when: "secedit.failed is defined and 'This host is joined to a Domain Controller' not in secedit.msg"
   tags:
       - cat2
       - medium
@@ -2655,7 +2655,7 @@
       key: SeDenyInteractiveLogonRight
       value: '*S-1-5-32-546' #Guests
   register: secedit
-  failed_when: "secedit.failed is defined and 'This host is joined to a Domain Controller' not in secedit.msg"
+  #failed_when: "secedit.failed is defined and 'This host is joined to a Domain Controller' not in secedit.msg"
   tags:
       - cat2
       - medium
@@ -2678,7 +2678,7 @@
       key: SeDenyRemoteInteractiveLogonRight
       value: '*S-1-5-32-546' #Guests
   register: secedit
-  failed_when: "secedit.failed is defined and 'This host is joined to a Domain Controller' not in secedit.msg"
+  #failed_when: "secedit.failed is defined and 'This host is joined to a Domain Controller' not in secedit.msg"
   tags:
       - cat2
       - medium
@@ -2701,7 +2701,7 @@
       key: SeEnableDelegationPrivilege
       value: '*S-1-5-32-544' #Administrators
   register: secedit
-  failed_when: "secedit.failed is defined and 'This host is joined to a Domain Controller' not in secedit.msg"
+  #failed_when: "secedit.failed is defined and 'This host is joined to a Domain Controller' not in secedit.msg"
   tags:
       - cat2
       - medium
@@ -2724,7 +2724,7 @@
       key: SeRemoteShutdownPrivilege
       value: '*S-1-5-32-544' #Administrators
   register: secedit
-  failed_when: "secedit.failed is defined and 'This host is joined to a Domain Controller' not in secedit.msg"
+  #failed_when: "secedit.failed is defined and 'This host is joined to a Domain Controller' not in secedit.msg"
   tags:
       - cat2
       - medium
@@ -2747,7 +2747,7 @@
       key: SeAuditPrivilege
       value: '*S-1-5-19,*S-1-5-20' #Local Service, Network Service
   register: secedit
-  failed_when: "secedit.failed is defined and 'This host is joined to a Domain Controller' not in secedit.msg"
+  #failed_when: "secedit.failed is defined and 'This host is joined to a Domain Controller' not in secedit.msg"
   tags:
       - cat2
       - medium
@@ -2770,7 +2770,7 @@
       key: SeImpersonatePrivilege
       value: '*S-1-5-19,*S-1-5-20,*S-1-5-32-544,*S-1-5-6' #Local Service, Network Service, Administrators, Service
   register: secedit
-  failed_when: "secedit.failed is defined and 'This host is joined to a Domain Controller' not in secedit.msg"
+  #failed_when: "secedit.failed is defined and 'This host is joined to a Domain Controller' not in secedit.msg"
   tags:
       - cat2
       - medium
@@ -2793,7 +2793,7 @@
       key: SeIncreaseWorkingSetPrivilege
       value: '*S-1-5-19,*S-1-5-32-544' #Local Service, Administrators
   register: secedit
-  failed_when: "secedit.failed is defined and 'This host is joined to a Domain Controller' not in secedit.msg"
+  #failed_when: "secedit.failed is defined and 'This host is joined to a Domain Controller' not in secedit.msg"
   tags:
       - cat2
       - medium
@@ -2816,7 +2816,7 @@
       key: SeIncreaseBasePriorityPrivilege
       value: '*S-1-5-32-544' #Administrators
   register: secedit
-  failed_when: "secedit.failed is defined and 'This host is joined to a Domain Controller' not in secedit.msg"
+  #failed_when: "secedit.failed is defined and 'This host is joined to a Domain Controller' not in secedit.msg"
   tags:
       - cat2
       - medium
@@ -2839,7 +2839,7 @@
       key: SeLoadDriverPrivilege
       value: '*S-1-5-32-544' #Administrators
   register: secedit
-  failed_when: "secedit.failed is defined and 'This host is joined to a Domain Controller' not in secedit.msg"
+  #failed_when: "secedit.failed is defined and 'This host is joined to a Domain Controller' not in secedit.msg"
   tags:
       - cat2
       - medium
@@ -2862,7 +2862,7 @@
       key: SeLockMemoryPrivilege
       value: ''
   register: secedit
-  failed_when: "secedit.failed is defined and 'This host is joined to a Domain Controller' not in secedit.msg"
+  #failed_when: "secedit.failed is defined and 'This host is joined to a Domain Controller' not in secedit.msg"
   tags:
       - cat2
       - medium
@@ -2885,7 +2885,7 @@
       key: SeBatchLogonRight
       value: '*S-1-5-32-544' #Administrators
   register: secedit
-  failed_when: "secedit.failed is defined and 'This host is joined to a Domain Controller' not in secedit.msg"
+  #failed_when: "secedit.failed is defined and 'This host is joined to a Domain Controller' not in secedit.msg"
   tags:
       - cat2
       - medium
@@ -2908,7 +2908,7 @@
       key: SeSecurityPrivilege
       value: '*S-1-5-32-544' #Administrators
   register: secedit
-  failed_when: "secedit.failed is defined and 'This host is joined to a Domain Controller' not in secedit.msg"
+  #failed_when: "secedit.failed is defined and 'This host is joined to a Domain Controller' not in secedit.msg"
   tags:
       - cat2
       - medium
@@ -2931,7 +2931,7 @@
       key: SeRelabelPrivilege
       value: ''
   register: secedit
-  failed_when: "secedit.failed is defined and 'This host is joined to a Domain Controller' not in secedit.msg"
+  #failed_when: "secedit.failed is defined and 'This host is joined to a Domain Controller' not in secedit.msg"
   tags:
       - cat2
       - medium
@@ -2954,7 +2954,7 @@
       key: SeSystemEnvironmentPrivilege
       value: '*S-1-5-32-544' #Administrators
   register: secedit
-  failed_when: "secedit.failed is defined and 'This host is joined to a Domain Controller' not in secedit.msg"
+  #failed_when: "secedit.failed is defined and 'This host is joined to a Domain Controller' not in secedit.msg"
   tags:
       - cat2
       - medium
@@ -2977,7 +2977,7 @@
       key: SeManageVolumePrivilege
       value: '*S-1-5-32-544' #Administrators
   register: secedit
-  failed_when: "secedit.failed is defined and 'This host is joined to a Domain Controller' not in secedit.msg"
+  #failed_when: "secedit.failed is defined and 'This host is joined to a Domain Controller' not in secedit.msg"
   tags:
       - cat2
       - medium
@@ -3000,7 +3000,7 @@
       key: SeProfileSingleProcessPrivilege
       value: '*S-1-5-32-544' #Administrators
   register: secedit
-  failed_when: "secedit.failed is defined and 'This host is joined to a Domain Controller' not in secedit.msg"
+  #failed_when: "secedit.failed is defined and 'This host is joined to a Domain Controller' not in secedit.msg"
   tags:
       - cat2
       - medium
@@ -3023,7 +3023,7 @@
       key: SeSystemProfilePrivilege
       value: '*S-1-5-32-544,*S-1-5-80-3139157870-2983391045-3678747466-658725712-1809340420' #Administrators, NT Service\WdiServiceHost
   register: secedit
-  failed_when: "secedit.failed is defined and 'This host is joined to a Domain Controller' not in secedit.msg"
+  #failed_when: "secedit.failed is defined and 'This host is joined to a Domain Controller' not in secedit.msg"
   tags:
       - cat2
       - medium
@@ -3046,7 +3046,7 @@
       key: SeAssignPrimaryTokenPrivilege
       value: '*S-1-5-19,*S-1-5-20' #Local Service, Network Service
   register: secedit
-  failed_when: "secedit.failed is defined and 'This host is joined to a Domain Controller' not in secedit.msg"
+  #failed_when: "secedit.failed is defined and 'This host is joined to a Domain Controller' not in secedit.msg"
   tags:
       - cat2
       - medium
@@ -3069,7 +3069,7 @@
       key: SeRestorePrivilege
       value: '*S-1-5-32-544' #Administrators
   register: secedit
-  failed_when: "secedit.failed is defined and 'This host is joined to a Domain Controller' not in secedit.msg"
+  #failed_when: "secedit.failed is defined and 'This host is joined to a Domain Controller' not in secedit.msg"
   tags:
       - cat2
       - medium
@@ -3092,7 +3092,7 @@
       key: SeShutdownPrivilege
       value: '*S-1-5-32-544' #Administrators
   register: secedit
-  failed_when: "secedit.failed is defined and 'This host is joined to a Domain Controller' not in secedit.msg"
+  #failed_when: "secedit.failed is defined and 'This host is joined to a Domain Controller' not in secedit.msg"
   tags:
       - cat2
       - medium
@@ -3115,7 +3115,7 @@
       key: SeTakeOwnershipPrivilege
       value: '*S-1-5-32-544' #Administrators
   register: secedit
-  failed_when: "secedit.failed is defined and 'This host is joined to a Domain Controller' not in secedit.msg"
+  #failed_when: "secedit.failed is defined and 'This host is joined to a Domain Controller' not in secedit.msg"
   tags:
       - cat2
       - medium
@@ -4045,7 +4045,7 @@
       - V-36439
 
 - name: "MEDIUM | V-36656 | AUDIT | A screen saver must be enabled on the system."
-  win_command: reg query \"HKCU\Software\Policies\Microsoft\Windows\Control Panel\Desktop\" /v ScreenSaveActive
+  win_shell: reg query 'HKCU\Software\Policies\Microsoft\Windows\Control Panel\Desktop' /v ScreenSaveActive
   register: screen_saver_enabled_audit
   check_mode: no
   changed_when: no
@@ -4069,7 +4069,7 @@
       - V-36656
 
 - name: "MEDIUM | V-36657 | AUDIT | The screen saver must be password protected."
-  win_command: reg query \"HKCU\Software\Policies\Microsoft\Windows\Control Panel\Desktop\" /v ScreenSaverIsSecure
+  win_shell: reg query 'HKCU\Software\Policies\Microsoft\Windows\Control Panel\Desktop' /v ScreenSaverIsSecure
   register: screen_saver_secure_audit
   check_mode: no
   changed_when: no
@@ -4181,7 +4181,7 @@
       - V-36680
 
 - name: "MEDIUM | V-36681 | AUDIT | Copying of user input methods to the system account for sign-in must be prevented."
-  win_command: reg query \"HKLM\Software\Policies\Microsoft\Control Panel\International\" /v BlockUserInputMethodsForSignIn
+  win_shell: reg query 'HKLM\Software\Policies\Microsoft\Control Panel\International' /v BlockUserInputMethodsForSignIn
   register: copy_user_system_audit
   check_mode: no
   changed_when: no
@@ -4325,7 +4325,7 @@
       - V-36708
 
 - name: "MEDIUM | V-36709 | AUDIT | Basic authentication for RSS feeds over HTTP must be turned off."
-  win_command: reg query \"HKLM\Software\Policies\Microsoft\Internet Explorer\Feeds\" /v AllowBasicAuthInClear
+  win_shell: reg query 'HKLM\Software\Policies\Microsoft\Internet Explorer\Feeds' /v AllowBasicAuthInClear
   register: authentication_rss_http_audit
   check_mode: no
   changed_when: no
@@ -4506,7 +4506,7 @@
       with_nested:
           - "{{ eventlog_permissions_audit.stdout_lines }}"
           - [ allow, deny ]
-     
+
     - name: "MEDIUM | V-36722 | PATCH | Permissions for the Application event log must prevent access by nonprivileged accounts."
       win_acl:
           path: 'C:\WINDOWS\SYSTEM32\WINEVT\LOGS\Application.evtx'
@@ -4520,12 +4520,12 @@
           - 'NT SERVICE\EventLog'
           - 'NT AUTHORITY\SYSTEM'
           - 'BUILTIN\Administrators'
-   
+
     - name: "REMOVAL MEDIUM | V-36722 | PATCH | Permissions for the Application event log must prevent access by nonprivileged accounts."
       win_acl_inheritance:
           path: 'C:\WINDOWS\SYSTEM32\WINEVT\LOGS\Application.evtx'
           state: 'absent'
-   
+
   when: "path_not_found not in eventlog_permissions_audit.stderr and eventlog_permissions_audit"
   tags:
       - cat2
@@ -4572,7 +4572,7 @@
       with_nested:
           - "{{ security_evtx_audit.stdout_lines }}"
           - [ allow, deny ]
-   
+
     - name: "MEDIUM | V-36723 | PATCH | Permissions for the Security event log must prevent access by nonprivileged accounts."
       win_acl:
           path: 'C:\WINDOWS\SYSTEM32\WINEVT\LOGS\Security.evtx'
@@ -4586,12 +4586,12 @@
           - 'NT SERVICE\Eventlog'
           - 'NT AUTHORITY\SYSTEM'
           - 'BUILTIN\Administrators'
-     
+
     - name: "REMOVAL MEDIUM | V-36723 | PATCH | Permissions for the Security event log must prevent access by nonprivileged accounts."
       win_acl_inheritance:
           path: 'C:\WINDOWS\SYSTEM32\WINEVT\LOGS\Security.evtx'
           state: 'absent'
-     
+
   when: "path_not_found not in security_evtx_audit.stderr and security_evtx_audit"
   tags:
       - cat2
@@ -4638,7 +4638,7 @@
       with_nested:
           - "{{ system_evtx_audit.stdout_lines }}"
           - [ allow, deny ]
-   
+
     - name: "MEDIUM | V-36724 | PATCH | Permissions for the System event log must prevent access by nonprivileged accounts."
       win_acl:
           path: 'C:\WINDOWS\SYSTEM32\WINEVT\LOGS\System.evtx'
@@ -4652,13 +4652,13 @@
           - 'NT SERVICE\EventLog'
           - 'NT AUTHORITY\SYSTEM'
           - 'BUILTIN\Administrators'
-   
+
 
     - name: "REMOVAL MEDIUM | V-36724 | PATCH | Permissions for the System event log must prevent access by nonprivileged accounts."
       win_acl_inheritance:
           path: 'C:\WINDOWS\SYSTEM32\WINEVT\LOGS\System.evtx'
           state: 'absent'
-   
+
   when: "path_not_found not in system_evtx_audit.stderr and system_evtx_audit"
   tags:
       - cat2
@@ -4753,7 +4753,7 @@
       with_nested:
           - '{{ program_files_minimum_audit.stdout_lines }}'
           - [ allow, deny ]
-     
+
     - name: "REMOVAL MEDIUM | V-40177 | PATCH | Permissions for program file directories must conform to minimum requirements."
       win_acl:
           path: '\Program Files (x86)'
@@ -4765,7 +4765,7 @@
       with_nested:
           - '{{ program_filesx86_minimum_audit.stdout_lines }}'
           - [ allow, deny ]
-   
+
     - name: "MEDIUM | V-40177 | PATCH | Permissions for program file directories must conform to minimum requirements."
       win_acl:
           path: '\Program Files'
@@ -4808,7 +4808,7 @@
             rights: 'ReadAndExecute'
             inherit: 'ContainerInherit, ObjectInherit'
             propagation: 'None'
-   
+
     - name: "MEDIUM | V-40177 | PATCH | Permissions for program file directories must conform to minimum requirements."
       win_acl:
           path: '\Program Files (x86)'
@@ -4851,7 +4851,7 @@
             rights: 'ReadAndExecute'
             inherit: 'ContainerInherit, ObjectInherit'
             propagation: 'None'
-   
+
     - name: "REMOVAL MEDIUM | V-40177 | PATCH | Permissions for program file directories must conform to minimum requirements."
       win_acl_inheritance:
           path: '{{ item }}'
@@ -4859,7 +4859,7 @@
       with_items:
           - '\Program Files'
           - '\Program Files (x86)'
-   
+
   when: "path_not_found not in (program_files_minimum_audit.stderr and program_filesx86_minimum_audit.stderr) and program_files_minimum_audit and program_filesx86_minimum_audit"
   tags:
       - cat2
@@ -4906,7 +4906,7 @@
       with_nested:
           - '{{ root_permissions_audit.stdout_lines }}'
           - [ allow, deny ]
-   
+
     - name: "MEDIUM | V-40178 | PATCH | Permissions for system drive root directory must conform to minimum requirements."
       win_acl:
           path: 'C:'
@@ -4941,12 +4941,12 @@
             rights: 'FullControl'
             inherit: 'ContainerInherit,ObjectInherit'
             propagation: 'InheritOnly'
-   
+
     - name: "MEDIUM | V-40178 | PATCH | Permissions for system drive root directory must conform to minimum requirements."
       win_acl_inheritance:
           path: 'C:'
           state: 'absent'
-   
+
   when: "path_not_found not in root_permissions_audit.stderr and root_permissions_audit"
   tags:
       - cat2
@@ -4993,7 +4993,7 @@
       with_nested:
           - "{{ windows_installation_audit.stdout_lines }}"
           - [ allow, deny ]
-   
+
     - name: "MEDIUM | V-40179 | PATCH | Permissions for Windows installation directory must conform to minimum requirements."
       win_acl:
           path: 'C:\Windows'
@@ -5032,12 +5032,12 @@
             rights: 'FullControl'
             inherit: 'ContainerInherit,ObjectInherit'
             propagation: 'None'
-   
+
     - name: "REMOVAL MEDIUM | V-40179 | PATCH | Permissions for Windows installation directory must conform to minimum requirements."
       win_acl_inheritance:
           path: 'C:\Windows'
           state: 'absent'
-   
+
   when: "path_not_found not in windows_installation_audit.stderr and windows_installation_audit"
   tags:
       - cat2
@@ -5205,7 +5205,7 @@
       - V-56511
 
 - name: "MEDIUM | V-57453 | AUDIT | The system must be configured to collect multiple error reports of the same event type."
-  win_command: reg query \"HKLM\SOFTWARE\Policies\Microsoft\Windows\Windows Error Reporting\" /v BypassDataThrottling
+  win_shell: reg query 'HKLM\SOFTWARE\Policies\Microsoft\Windows\Windows Error Reporting' /v BypassDataThrottling
   register: multiple_error_reports_audit
   check_mode: no
   changed_when: no
@@ -5229,7 +5229,7 @@
       - V-57453
 
 - name: "MEDIUM | V-57455 | AUDIT | The system must be configured to prevent the display of error messages to the user."
-  win_command: reg query \"HKLM\SOFTWARE\Policies\Microsoft\Windows\Windows Error Reporting\" /v DontShowUI
+  win_shell: reg query 'HKLM\SOFTWARE\Policies\Microsoft\Windows\Windows Error Reporting' /v DontShowUI
   register: error_message_audit
   check_mode: no
   changed_when: no
@@ -5253,7 +5253,7 @@
       - V-57455
 
 - name: "MEDIUM | V-57457 | AUDIT | The system must be configured to store error reports locally, on the system or in the enclave, and not send them to Microsoft."
-  win_command: reg query \"HKLM\SOFTWARE\Policies\Microsoft\Windows\Windows Error Reporting\" /v CorporateWerServer
+  win_shell: reg query 'HKLM\SOFTWARE\Policies\Microsoft\Windows\Windows Error Reporting' /v CorporateWerServer
   register: error_message_audit
   check_mode: no
   changed_when: no
@@ -5280,7 +5280,7 @@
 
 # Need to recheck if WER is being used first. Skip the rest if WER is not configured.
 - name: "MEDIUM | V-57459 | AUDIT | The system must be configured to use SSL to forward error reports."
-  win_command: reg query \"HKLM\SOFTWARE\Policies\Microsoft\Windows\Windows Error Reporting\" /v CorporateWerServer
+  win_shell: reg query 'HKLM\SOFTWARE\Policies\Microsoft\Windows\Windows Error Reporting' /v CorporateWerServer
   register: error_message_audit
   check_mode: no
   changed_when: no
@@ -5307,7 +5307,7 @@
 
 # Need to recheck if WER is being used first. Skip the rest if WER is not configured.
 - name: "MEDIUM | V-57461 | AUDIT | The system must be configured to send error reports on TCP port 1232."
-  win_command: reg query \"HKLM\SOFTWARE\Policies\Microsoft\Windows\Windows Error Reporting\" /v CorporateWerServer
+  win_shell: reg query 'HKLM\SOFTWARE\Policies\Microsoft\Windows\Windows Error Reporting' /v CorporateWerServer
   register: error_message_audit
   check_mode: no
   changed_when: no
@@ -5320,7 +5320,7 @@
 
 # Only run when WER server isn't blank
 - name: "MEDIUM | V-57461 | AUDIT | The system must be configured to send error reports on TCP port 1232."
-  win_command: reg query \"HKLM\SOFTWARE\Policies\Microsoft\Windows\Windows Error Reporting\" /v CorporateWerPortNumber
+  win_shell: reg query 'HKLM\SOFTWARE\Policies\Microsoft\Windows\Windows Error Reporting' /v CorporateWerPortNumber
   register: error_message_port_audit
   check_mode: no
   changed_when: no
@@ -5347,7 +5347,7 @@
       - V-57461
 
 - name: "MEDIUM | V-57463 | AUDIT | The system must be configured to archive error reports."
-  win_command: reg query \"HKLM\SOFTWARE\Policies\Microsoft\Windows\Windows Error Reporting\" /v DisableArchive
+  win_shell: reg query 'HKLM\SOFTWARE\Policies\Microsoft\Windows\Windows Error Reporting' /v DisableArchive
   register: disable_archive_audit
   check_mode: no
   changed_when: no
@@ -5371,7 +5371,7 @@
       - V-57463
 
 - name: "MEDIUM | V-57465 | AUDIT | The system must be configured to store all data in the error report archive."
-  win_command: reg query \"HKLM\SOFTWARE\Policies\Microsoft\Windows\Windows Error Reporting\" /v ConfigureArchive
+  win_shell: reg query 'HKLM\SOFTWARE\Policies\Microsoft\Windows\Windows Error Reporting' /v ConfigureArchive
   register: archive_error_reports_audit
   check_mode: no
   changed_when: no
@@ -5395,7 +5395,7 @@
       - V-57465
 
 - name: "MEDIUM | V-57467 | AUDIT | The maximum number of error reports to archive on a system must be configured to 100 or greater."
-  win_command: reg query \"HKLM\SOFTWARE\Policies\Microsoft\Windows\Windows Error Reporting\" /v MaxArchiveCount
+  win_shell: reg query 'HKLM\SOFTWARE\Policies\Microsoft\Windows\Windows Error Reporting' /v MaxArchiveCount
   register: max_achive_count_audit
   check_mode: no
   changed_when: no
@@ -5419,7 +5419,7 @@
       - V-57467
 
 - name: "MEDIUM | V-57469 | AUDIT | The system must be configured to queue error reports until a local or DOD-wide collector is available."
-  win_command: reg query \"HKLM\SOFTWARE\Policies\Microsoft\Windows\Windows Error Reporting\" /v DisableQueue
+  win_shell: reg query 'HKLM\SOFTWARE\Policies\Microsoft\Windows\Windows Error Reporting' /v DisableQueue
   register: disable_queue_audit
   check_mode: no
   changed_when: no
@@ -5443,7 +5443,7 @@
       - V-57469
 
 - name: "MEDIUM | V-57471 | AUDIT | The system must be configured to add all error reports to the queue."
-  win_command: reg query \"HKLM\SOFTWARE\Policies\Microsoft\Windows\Windows Error Reporting\" /v ForceQueue
+  win_shell: reg query 'HKLM\SOFTWARE\Policies\Microsoft\Windows\Windows Error Reporting' /v ForceQueue
   register: force_queue_audit
   check_mode: no
   changed_when: no
@@ -5467,7 +5467,7 @@
       - V-57471
 
 - name: "MEDIUM | V-57473 | AUDIT | The maximum number of error reports to queue on a system must be configured to 50 or greater."
-  win_command: reg query \"HKLM\SOFTWARE\Policies\Microsoft\Windows\Windows Error Reporting\" /v MaxQueueCount
+  win_shell: reg query 'HKLM\SOFTWARE\Policies\Microsoft\Windows\Windows Error Reporting' /v MaxQueueCount
   register: max_queue_audit
   check_mode: no
   changed_when: no
@@ -5491,7 +5491,7 @@
       - V-57473
 
 - name: "MEDIUM | V-57475 | AUDIT | The system must be configured to attempt to forward queued error reports once a day."
-  win_command: reg query \"HKLM\SOFTWARE\Policies\Microsoft\Windows\Windows Error Reporting\" /v QueuePesterInterval
+  win_shell: reg query 'HKLM\SOFTWARE\Policies\Microsoft\Windows\Windows Error Reporting' /v QueuePesterInterval
   register: daily_forward_audit
   check_mode: no
   changed_when: no
@@ -5515,7 +5515,7 @@
       - V-57475
 
 - name: "MEDIUM | V-57477 | AUDIT | The system must be configured to automatically consent to send all data requested by a local or DOD-wide error collection site."
-  win_command: reg query \"HKLM\SOFTWARE\Policies\Microsoft\Windows\Windows Error Reporting\Consent\" /v DefaultConsent
+  win_shell: reg query 'HKLM\SOFTWARE\Policies\Microsoft\Windows\Windows Error Reporting\Consent' /v DefaultConsent
   register: default_consent_audit
   check_mode: no
   changed_when: no
@@ -5539,7 +5539,7 @@
       - V-57477
 
 - name: "MEDIUM | V-57479 | AUDIT | The system must be configured to permit the default consent levels of Windows Error Reporting to override any other consent policy setting."
-  win_command: reg query \"HKLM\SOFTWARE\Policies\Microsoft\Windows\Windows Error Reporting\Consent\" /v DefaultOverrideBehavior
+  win_shell: reg query 'HKLM\SOFTWARE\Policies\Microsoft\Windows\Windows Error Reporting\Consent' /v DefaultOverrideBehavior
   register: override_audit
   check_mode: no
   changed_when: no
@@ -5664,7 +5664,7 @@
       with_nested:
           - "{{ event_viewer_audit.stdout_lines }}"
           - [ allow, deny ]
-     
+
     - name: "MEDIUM | V-57721 | PATCH | Event Viewer must be protected from unauthorized modification and deletion."
       win_acl:
           path: 'C:\Windows\System32\Eventvwr.exe'
@@ -5691,12 +5691,12 @@
             rights: 'ReadAndExecute'
             inherit: 'None'
             propagation: 'None'
-   
+
     - name: "REMOVAL MEDIUM | V-57721 | PATCH | Event Viewer must be protected from unauthorized modification and deletion."
       win_acl_inheritance:
           path: 'C:\Windows\System32\Eventvwr.exe'
           state: absent
-   
+
   when: "path_not_found not in event_viewer_audit.stderr and event_viewer_audit"
   tags:
       - cat2

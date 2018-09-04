@@ -23,7 +23,7 @@
       - V-1075
 
 - name: "LOW | V-1090 | AUDIT | Caching of logon credentials must be limited."
-  win_command: reg query \"HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon\" /v CachedLogonsCount
+  win_shell: reg query 'HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon' /v CachedLogonsCount
   register: cached_logons_audit
   check_mode: no
   changed_when: no
@@ -57,7 +57,7 @@
       - V-1112
 
 - name: "LOW | V-1151 | AUDIT | The print driver installation privilege will be restricted to administrators."
-  win_command: reg query \"HKLM\System\CurrentControlSet\Control\Print\Providers\LanMan Print Services\Servers\" /v AddPrinterDrivers
+  win_shell: reg query 'HKLM\System\CurrentControlSet\Control\Print\Providers\LanMan Print Services\Servers' /v AddPrinterDrivers
   register: add_printer_driver_audit
   check_mode: no
   changed_when: no
@@ -81,7 +81,7 @@
       - V-1151
 
 - name: "LOW | V-1158 | AUDIT | The Recovery Console SET command must be disabled."
-  win_command: reg query \"HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Setup\RecoveryConsole\" /v SetCommand
+  win_shell: reg query 'HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Setup\RecoveryConsole' /v SetCommand
   register: set_command_audit
   check_mode: no
   changed_when: no
@@ -129,7 +129,7 @@
       - V-1165
 
 - name: "LOW | V-1172 | AUDIT | Users will be warned in advance that their passwords will expire."
-  win_command: reg query \"HKLM\Software\Microsoft\Windows NT\CurrentVersion\Winlogon\" /v PasswordExpiryWarning
+  win_shell: reg query 'HKLM\Software\Microsoft\Windows NT\CurrentVersion\Winlogon' /v PasswordExpiryWarning
   register: password_expiry_warning_audit
   check_mode: no
   changed_when: no
@@ -153,7 +153,7 @@
       - V-1172
 
 - name: "LOW | V-1173 | AUDIT | The default permissions of Global system objects will be increased."
-  win_command: reg query \"HKLM\System\CurrentControlSet\Control\Session Manager\" /v ProtectionMode
+  win_shell: reg query 'HKLM\System\CurrentControlSet\Control\Session Manager' /v ProtectionMode
   register: protection_mode_audit
   check_mode: no
   changed_when: no
@@ -369,7 +369,7 @@
       - V-4438
 
 - name: "LOW | V-4442 | AUDIT | The system will be configured to have password protection take effect within a limited time frame when the screen saver becomes active."
-  win_command: reg query \"HKLM\Software\Microsoft\Windows NT\CurrentVersion\Winlogon\" /v ScreenSaverGracePeriod
+  win_shell: reg query 'HKLM\Software\Microsoft\Windows NT\CurrentVersion\Winlogon' /v ScreenSaverGracePeriod
   register: screen_saver_password_audit
   check_mode: no
   changed_when: no
@@ -393,7 +393,7 @@
       - V-4442
 
 - name: "LOW | V-4445 | AUDIT | Optional Subsystems will not be permitted to operate on the system."
-  win_command: reg query \"HKLM\System\CurrentControlSet\Control\Session Manager\Subsystems\" /v Optional
+  win_shell: reg query 'HKLM\System\CurrentControlSet\Control\Session Manager\Subsystems' /v Optional
   register: optional_subsystem_audit
   check_mode: no
   changed_when: no
@@ -405,7 +405,7 @@
       - V-4445
 
 - name: "LOW | V-4445 | PATCH | Optional Subsystems will not be permitted to operate on the system."
-  win_command: reg add \"HKLM\System\CurrentControlSet\Control\Session Manager\Subsystems\" /v Optional /t REG_MULTI_SZ /f
+  win_shell: reg add 'HKLM\System\CurrentControlSet\Control\Session Manager\Subsystems' /v Optional /t REG_MULTI_SZ /f
   tags:
       - cat3
       - low
@@ -413,7 +413,7 @@
       - V-4445
 
 - name: "LOW | V-11806 | AUDIT | The system will be configured to prevent the display of the last user name on the logon screen."
-  win_command: reg query \"HKLM\Software\Microsoft\Windows\CurrentVersion\Policies\System\" /v DontDisplayLastUserName
+  win_shell: reg query 'HKLM\Software\Microsoft\Windows\CurrentVersion\Policies\System' /v DontDisplayLastUserName
   register: last_name_audit
   check_mode: no
   changed_when: no
@@ -761,7 +761,7 @@
       - V-21956
 
 - name: "LOW | V-21960 | AUDIT | Domain users will be required to elevate when setting a network's location."
-  win_command: reg query \"HKLM\Software\Policies\Microsoft\Windows\Network Connections\" /v NC_StdDomainUserSetLocation
+  win_shell: reg query 'HKLM\Software\Policies\Microsoft\Windows\Network Connections' /v NC_StdDomainUserSetLocation
   register: elevate_setting_network_audit
   check_mode: no
   changed_when: no
@@ -797,7 +797,7 @@
       - V-21961
 
 - name: "LOW | V-21963 | AUDIT | Windows Update will be prevented from searching for point and print drivers."
-  win_command: reg query \"HKLM\Software\Policies\Microsoft\Windows NT\Printers\" /v DoNotInstallCompatibleDriverFromWindowsUpdate
+  win_shell: reg query 'HKLM\Software\Policies\Microsoft\Windows NT\Printers' /v DoNotInstallCompatibleDriverFromWindowsUpdate
   register: windows_update_search_audit
   check_mode: no
   changed_when: no
@@ -821,7 +821,7 @@
       - V-21963
 
 - name: "LOW | V-21964 | AUDIT | Device metadata retrieval from the Internet must be prevented."
-  win_command: reg query \"HKLM\SOFTWARE\Policies\Microsoft\Windows\Device Metadata\" /v PreventDeviceMetadataFromNetwork
+  win_shell: reg query 'HKLM\SOFTWARE\Policies\Microsoft\Windows\Device Metadata' /v PreventDeviceMetadataFromNetwork
   register: device_metadata_audit
   check_mode: no
   changed_when: no
@@ -982,7 +982,7 @@
       key: SeChangeNotifyPrivilege
       value: '*S-1-5-11,*S-1-5-19,*S-1-5-20,*S-1-5-32-544' #Authenticated Users, Local Service, Network Service, Administrators
   register: secedit
-  failed_when: "secedit.failed is defined and 'This host is joined to a Domain Controller' not in secedit.msg"
+  ##failed_when: "secedit.failed is defined and 'This host is joined to a Domain Controller' not in secedit.msg"
   tags:
       - cat3
       - low
@@ -1005,7 +1005,7 @@
       key: SeTimeZonePrivilege
       value: '*S-1-5-19,*S-1-5-32-544' #Local Service, Administrators
   register: secedit
-  failed_when: "secedit.failed is defined and 'This host is joined to a Domain Controller' not in secedit.msg"
+  #failed_when: "secedit.failed is defined and 'This host is joined to a Domain Controller' not in secedit.msg"
   tags:
       - cat3
       - low
@@ -1205,7 +1205,7 @@
       - V-36710
 
 - name: "LOW | V-36774 | AUDIT | A screen saver must be defined."
-  win_command: reg query \"HKCU\Software\Policies\Microsoft\Windows\Control Panel\Desktop\" /v SCRNSAVE.EXE
+  win_shell: reg query 'HKCU\Software\Policies\Microsoft\Windows\Control Panel\Desktop' /v SCRNSAVE.EXE
   register: screen_saver_disabled_audit
   check_mode: no
   changed_when: no

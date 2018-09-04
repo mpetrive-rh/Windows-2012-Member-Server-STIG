@@ -22,6 +22,7 @@
       - high
       - audit
       - V-1074
+  when: not stig_ignore_mcafee | default(false)
 
 - name: "HIGH | V-1081 | AUDIT | Local volumes must be formatted using NTFS."
   win_shell: Get-Volume | Select-Object -Property DriveLetter,FileSystem
@@ -47,7 +48,7 @@
       - V-1093
 
 - name: "HIGH | V-1093 | PATCH | Anonymous enumeration of shares will be restricted."
-  win_regedit: 
+  win_regedit:
       key: 'HKLM:\System\CurrentControlSet\Control\Lsa'
       value: RestrictAnonymous
       data: 1
@@ -69,17 +70,18 @@
       - V-1102
 
 - name: "HIGH | V-1102 | PATCH | Unauthorized accounts must not have the Act as part of the operating system user right."
-  win_secedit: 
+  win_secedit:
       category: 'Privilege Rights'
       key: SeTcbPrivilege
       value: ''
   register: secedit
-  failed_when: "secedit.failed is defined and 'This host is joined to a Domain Controller' not in secedit.msg"
+  #failed_when: "secedit.failed is defined and 'This host is joined to a Domain Controller' not in secedit.msg"
   tags:
       - cat1
       - high
       - patch
       - V-1102
+  when: not stig_ignore_dc | default(false)
 
 - name: "HIGH | V-1121 | AUDIT | Installed FTP server will not be configured to allow access to the system drive."
   win_shell: (Get-Service -name *ftpsvc).Status
@@ -101,7 +103,7 @@
       register: temp_dir
 
     - name: "HIGH | V-1121 | AUDIT | Copy over ftp script"
-      win_copy: 
+      win_copy:
           src: 1121.txt
           dest: "{{ temp_dir.stdout_lines[0] }}"
       register: copy_hotfix
@@ -194,7 +196,7 @@
       with_nested:
           - "{{ anon_registry_access_audit.stdout_lines }}"
           - [ allow, deny ]
-   
+
     - name: "HIGH | V-1152 | PATCH | Admin Anonymous access to the registry must be restricted."
       win_acl:
           path: 'HKLM:\SYSTEM\CurrentControlSet\Control\SecurePipeServers\Winreg\'
@@ -217,12 +219,12 @@
             rights: 'ReadKey'
             inherit: 'ContainerInherit, ObjectInherit'
             propagation: 'None'
-     
+
     - name: "REMOVAL HIGH | V-1152 | PATCH | Anonymous access to the registry must be restricted."
       win_acl_inheritance:
           path: 'HKLM:\SYSTEM\CurrentControlSet\Control\SecurePipeServers\Winreg'
           state: 'absent'
-   
+
   when: "path_not_found not in anon_registry_access_audit.stderr and anon_registry_access_audit"
   tags:
       - cat1
@@ -256,7 +258,7 @@
       - V-1153
 
 - name: "HIGH | V-1159 | AUDIT | The Recovery Console option must be set to prevent automatic logon to the system."
-  win_command: reg query \"HKLM\Software\Microsoft\Windows NT\CurrentVersion\Setup\RecoveryConsole\" /v SecurityLevel
+  win_shell: reg query 'HKLM\Software\Microsoft\Windows NT\CurrentVersion\Setup\RecoveryConsole' /v SecurityLevel
   register: recovery_prevent_autologin_audit
   check_mode: no
   changed_when: no
@@ -280,7 +282,7 @@
       - V-1159
 
 - name: "HIGH | V-2374 | AUDIT | Autoplay must be disabled for all drives."
-  win_command: reg query HKLM\Software\Microsoft\Windows\CurrentVersion\policies\Explorer\ /v NoDriveTypeAutoRun 
+  win_command: reg query HKLM\Software\Microsoft\Windows\CurrentVersion\policies\Explorer\ /v NoDriveTypeAutoRun
   register: autoplay_disabled_audit
   check_mode: no
   changed_when: no
@@ -319,12 +321,13 @@
       key: LSAAnonymousNameLookup
       value: '0'
   register: secedit
-  failed_when: "secedit.failed is defined and 'This host is joined to a Domain Controller' not in secedit.msg"
+  #failed_when: "secedit.failed is defined and 'This host is joined to a Domain Controller' not in secedit.msg"
   tags:
       - cat1
       - high
       - patch
       - V-3337
+  when: not stig_ignore_dc | default(false)
 
 - name: "HIGH | V-3338 | AUDIT | Named pipes that can be accessed anonymously must be configured with limited values on domain controllers."
   win_command: reg query HKLM\System\CurrentControlSet\Services\LanManServer\Parameters\ /v NullSessionPipes
@@ -391,7 +394,7 @@
       - V-3340
 
 - name: "HIGH | V-3343 | AUDIT | Solicited Remote Assistance must not be allowed."
-  win_command: reg query \"HKLM\Software\Policies\Microsoft\Windows NT\Terminal Services\" /v fAllowToGetHelp
+  win_shell: reg query 'HKLM\Software\Policies\Microsoft\Windows NT\Terminal Services' /v fAllowToGetHelp
   register: solicited_remote_assistance_audit
   check_mode: no
   changed_when: no
@@ -550,12 +553,13 @@
       key: SeDebugPrivilege
       value: '*S-1-5-32-544' # Administrators group
   register: secedit
-  failed_when: "secedit.failed is defined and 'This host is joined to a Domain Controller' not in secedit.msg"
+  #failed_when: "secedit.failed is defined and 'This host is joined to a Domain Controller' not in secedit.msg"
   tags:
       - cat1
       - high
       - patch
       - V-18010
+  when: not stig_ignore_dc | default(false)
 
 - name: "HIGH | V-21973 | AUDIT | Autoplay must be turned off for non-volume devices."
   win_command: reg query HKLM\Software\Policies\Microsoft\Windows\Explorer\ /v NoAutoplayfornonVolume
@@ -642,7 +646,7 @@
       with_nested:
           - "{{ standard_user_read_audit.stdout_lines }}"
           - [ allow, deny ]
-   
+
     - name: "HIGH | V-26070 | PATCH | Standard user accounts must only have Read permissions to the Winlogon registry key."
       win_acl:
           path: 'HKLM:\Software\Microsoft\Windows NT\CurrentVersion\Winlogon'
@@ -673,12 +677,12 @@
             rights: 'ReadKey'
             inherit: 'ContainerInherit, ObjectInherit'
             propagation: 'None'
-   
+
     - name: "REMOVAL HIGH | V-26070 | PATCH | Standard user accounts must only have Read permissions to the Winlogon registry key."
       win_acl_inheritance:
           path: 'HKLM:\Software\Microsoft\Windows NT\CurrentVersion\Winlogon'
           state: absent
-   
+
   when: "path_not_found not in standard_user_read_audit.stderr and standard_user_read_audit"
   tags:
       - cat1
@@ -686,7 +690,7 @@
       - patch
       - V-26070
 ########################################### block end ###################################################
-     
+
 - name: "HIGH | V-26283 | AUDIT | Anonymous enumeration of SAM accounts must not be allowed."
   win_command: reg query HKLM\System\CurrentControlSet\Control\Lsa\ /v RestrictAnonymousSAM
   register: anonymous_enum_sam_audit
@@ -727,12 +731,13 @@
       key: SeCreateTokenPrivilege
       value: ''
   register: secedit
-  failed_when: "secedit.failed is defined and 'This host is joined to a Domain Controller' not in secedit.msg"
+  #failed_when: "secedit.failed is defined and 'This host is joined to a Domain Controller' not in secedit.msg"
   tags:
       - cat1
       - high
       - patch
       - V-26479
+  when: not stig_ignore_dc | default(false)
 
 - name: "HIGH | V-32282 | AUDIT | Standard user accounts must only have Read permissions to the Active Setup Installed Components registry key."
   win_shell: (Get-Acl -PATH 'HKLM:\SOFTWARE\Microsoft\Active Setup\Installed Components').Access.IdentityReference.Value
@@ -809,12 +814,12 @@
             rights: 'ReadKey'
             inherit: 'ContainerInherit, ObjectInherit'
             propagation: 'None'
-    
+
     - name: "REMOVAL HIGH | V-32282 | PATCH | Standard user accounts must only have Read permissions to the Active Setup Installed Components registry key."
       win_acl_inheritance:
           path: 'HKLM:\SOFTWARE\Microsoft\Active Setup\Installed Components'
           state: absent
-   
+
   when: "path_not_found not in standard_read_active_audit.stderr and standard_read_active_audit"
   tags:
       - cat1
@@ -837,7 +842,7 @@
       with_nested:
           - "{{ standard_read_active2_audit.stdout_lines }}"
           - [ allow, deny ]
-   
+
     - name: "HIGH | V-32282 | PATCH | Standard user accounts must only have Read permissions to the Active Setup Installed Components registry key."
       win_acl:
           path: 'HKLM:\SOFTWARE\Wow6432Node\Microsoft\Active Setup\Installed Components'
@@ -868,12 +873,12 @@
             rights: 'ReadKey'
             inherit: 'ContainerInherit, ObjectInherit'
             propagation: 'None'
-   
+
     - name: "REMOVAL HIGH | V-32282 | PATCH | Standard user accounts must only have Read permissions to the Active Setup Installed Components registry key."
       win_acl_inheritance:
           path: 'HKLM:\SOFTWARE\Wow6432Node\Microsoft\Active Setup\Installed Components'
           state: absent
-   
+
   when: "ansible_architecture == '64-bit' and path_not_found not in standard_read_active2_audit.stderr and standard_read_active2_audit"
   tags:
       - cat1
@@ -917,7 +922,8 @@
       - high
       - audit
       - V-36712
-      
+  when: not stig_ignore_winrm | default(false)
+
 - name: "HIGH | V-36712 | PATCH | The Windows Remote Management (WinRM) client must not use Basic authentication."
   win_regedit:
       key: 'HKLM:\Software\Policies\Microsoft\Windows\WinRM\Client'
@@ -929,6 +935,7 @@
       - high
       - patch
       - V-36712
+  when: not stig_ignore_winrm | default(false)
 
 - name: "HIGH | V-36718 | AUDIT | The Windows Remote Management (WinRM) service must not use Basic authentication."
   win_command: reg query HKLM\Software\Policies\Microsoft\Windows\WinRM\Service\ /v AllowBasic
@@ -941,6 +948,7 @@
       - high
       - audit
       - V-36718
+  when: not stig_ignore_winrm | default(false)
 
 - name: "HIGH | V-36718 | PATCH | The Windows Remote Management (WinRM) service must not use Basic authentication."
   win_regedit:
@@ -952,7 +960,8 @@
       - cat1
       - high
       - patch
-      - V-36718 
+      - V-36718
+  when: not stig_ignore_winrm | default(false)
 
 - name: "HIGH | V-40175 | AUDIT | The antivirus program signature files must be kept updated."
   win_command: reg query \"HKLM\Software\Wow6432Node\Network Associates\ePolicy Orchestrator\Application Plugins\VIRUSCAN8800\" /v DatDate
@@ -965,6 +974,7 @@
       - high
       - audit
       - V-40175
+  when: not stig_ignore_mcafee | default(false)
 
 # - name: "HIGH | V-40175 | PATCH | The antivirus program signature files must be kept updated."
 #   win_command: true
